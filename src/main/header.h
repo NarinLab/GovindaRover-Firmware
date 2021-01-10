@@ -5,3 +5,4 @@
 #define PIN_IN4 10
 #define PIN_ENB 6
 #define PIN_SERVO_X 3
+#define PIN_SERVO_Y 9
