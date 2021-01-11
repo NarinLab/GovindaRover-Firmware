@@ -11,6 +11,7 @@ void actuator_setup(){
   pinMode(PIN_IN4, OUTPUT);
   pinMode(PIN_ENB, OUTPUT);
   pinMode(PIN_SERVO_X, OUTPUT);
+  pinMode(PIN_SERVO_Y, OUTPUT);
 }
 
 void actuator_set_direction(){
@@ -29,15 +30,19 @@ void actuator_set_speed(){
 
 void actuator_set_camera(){
   Servo SERVO_X;
+  Servo SERVO_Y;
   SERVO_X.attach(PIN_SERVO_X);
+  SERVO_Y.attach(PIN_SERVO_Y);
   int pos;
   for (pos = 0; pos <= 180; pos += 1) { // goes from 0 degrees to 180 degrees
     // in steps of 1 degree
     SERVO_X.write(pos);              // tell servo to go to position in variable 'pos'
+    SERVO_Y.write(pos);
     delay(15);                       // waits 15ms for the servo to reach the position
   }
   for (pos = 180; pos >= 0; pos -= 1) { // goes from 180 degrees to 0 degrees
     SERVO_X.write(pos);              // tell servo to go to position in variable 'pos'
+    SERVO_Y.write(pos);
     delay(15);                       // waits 15ms for the servo to reach the position
   }
 }
