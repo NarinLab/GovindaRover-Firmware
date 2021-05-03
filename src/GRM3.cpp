@@ -8,7 +8,13 @@
 
 #include "GRM3.h"
 
-GRM3::GRM3(){}
+GRM3::GRM3()
+{
+  _SERVOX.attach(PIN_SERVO_X);
+  _SERVOY.attach(PIN_SERVO_Y);
+  _SERVOX_POS = 90;
+  _SERVOY_POS = 90;
+}
 void GRM3::begin()
 {
   Serial.begin(115200);
@@ -26,6 +32,7 @@ void GRM3::begin()
 
 void GRM3::execute(){
   _serialCommandHandler(Serial);
+  lookAt();
 }
 
 void GRM3::setDirection(char dir)
@@ -72,9 +79,24 @@ void GRM3::setSpeed(uint8_t pwm)
   analogWrite(PIN_ENB, pwm);
 }
 
-void GRM3::lookAt(uint8_t x, uint8_t y)
+void GRM3::setHead(uint8_t x, uint8_t y)
 {
-  
+  if(x < 0 || x > 180 || y < 0 || y > 180) return;
+  _SERVOX_POS = x;
+  _SERVOY_POS = y;
+}
+
+void GRM3::lookAt()
+{
+  if ((millis() - _servoCounter) >= SERVO_SPEED) {
+    _servoCounter = millis();
+
+    if (_SERVOX_POS > _SERVOX.read()) _SERVOX.write(_SERVOX.read() + 1);
+    else if (_SERVOX_POS < _SERVOX.read()) _SERVOX.write(_SERVOX.read() - 1);
+
+    if (_SERVOY_POS > _SERVOY.read()) _SERVOY.write(_SERVOY.read() + 1);
+    else if (_SERVOY_POS < _SERVOY.read()) _SERVOY.write(_SERVOY.read() - 1);
+  }
 }
 
 void GRM3::_serialCommandHandler(HardwareSerial &serial)
@@ -109,6 +131,6 @@ void GRM3::_commandHandler(StaticJsonDocument<DOCSIZE> doc)
   }
   else if(strcmp(method, (const char*) "look"))
   {
-    lookAt(doc["params"]["x"].as<uint8_t>(), doc["params"]["y"].as<uint8_t>());
+    setHead(doc["params"]["x"].as<uint8_t>(), doc["params"]["y"].as<uint8_t>());
   }
 }
